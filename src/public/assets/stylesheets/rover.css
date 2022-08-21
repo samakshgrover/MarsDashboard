@@ -1,0 +1,104 @@
+.rover-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3rem;
+}
+
+.info {
+  background-color: rgba(0, 0, 0, 0.5);
+  margin: 20px;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 25px;
+}
+
+.info h1 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+ul {
+  list-style: none;
+  /* border: 1px solid; */
+}
+
+li {
+  color: #fff;
+  font-size: 1.5rem;
+  padding: 10px 0;
+  border-bottom: 1px solid;
+  display: flex;
+  justify-content: space-between;
+  /* margin-top: 10px; */
+}
+
+li span {
+  color: chocolate;
+  font-size: 1.2rem;
+}
+
+.photos-container {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  display: inline-block;
+  margin: 20px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.photos-container h1 {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.photos {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 50px;
+  justify-content: center;
+}
+
+.photo {
+  box-sizing: content-box;
+  height: 300px;
+  width: 300px;
+  border: 18px groove gray;
+  border-radius: 5px;
+  /* background-image: url('../Navbar/mars-logo.png'); */
+  /* background-size: cover; */
+  position: relative;
+  overflow: hidden;
+}
+
+.photo img {
+  height: inherit;
+  width: inherit;
+}
+
+.photo div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background-color: blue; */
+  opacity: 0;
+  /* color: #fff; */
+  font-size: 1rem;
+  transition: all 0.5s;
+}
+
+.photo:hover div {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.photo div ul li {
+  color: black;
+  padding: 10px 10px;
+}
