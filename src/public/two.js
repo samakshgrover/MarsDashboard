@@ -133,17 +133,13 @@ const spinner = () => {
 };
 
 const handleClick = (event) => {
-  console.log("clicked");
   const rover = event.target.id;
-  console.log(rover);
   const element = event.target.parentNode.parentNode.parentNode;
-  console.log(element);
   event.target.parentNode.parentNode.innerHTML = spinner();
 
   fetch(`http://localhost:3000/${rover}`)
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
       element.innerHTML = Rover(data);
     });
 };

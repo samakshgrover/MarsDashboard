@@ -25,7 +25,6 @@ const render = (root, state) => {
 //and app will re-render after state changes
 const updateState = (newState) => {
   store = store.mergeDeep(newState);
-  console.log(store.toJS());
   render(root, store);
 };
 
@@ -110,7 +109,6 @@ const RoverItem = (state) => {
   debugger;
   const manifesto = state.getIn(["data", "manifesto"]).toJS();
   const photos = state.getIn(["data", "photos"]).toJS();
-  console.log({ manifesto, photos });
   const { landing_date, launch_date, max_sol, name, status, total_photos } =
     manifesto;
 
@@ -174,7 +172,6 @@ const fetchData = async (rover) => {
 };
 
 const hadleHomeClick = (event) => {
-  console.log("click");
   updateState({ selectedRover: null });
 };
 

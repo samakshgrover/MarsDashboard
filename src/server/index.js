@@ -31,7 +31,6 @@ app.get("/Curiosity", (req, res) => {
 
           const two = lp.data.latest_photos;
 
-          console.log({ resp: resp.data, lp: lp.data });
           res.send({ manifesto: one, photos: two });
         });
     });
@@ -53,7 +52,6 @@ app.get("/Opportunity", (req, res) => {
 
           const two = lp.data.latest_photos;
 
-          // console.log({ resp: resp.data, lp: lp.data });
           res.send({ manifesto: one, photos: two });
         });
     });
@@ -75,7 +73,6 @@ app.get("/Spirit", (req, res) => {
 
           const two = lp.data.latest_photos;
 
-          // console.log({ resp: resp.data, lp: lp.data });
           res.send({ manifesto: one, photos: two, res: resp.data });
         });
     });
