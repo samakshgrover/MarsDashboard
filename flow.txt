@@ -1,5 +1,0 @@
-Describe ui:
-    --> we have two pages 1) landing page (list of rovers) 2) selected rover page
-    --> we will show a page that has three rover which are slectable and we want to whom after slecting we will show a page related to that rover
-    --> there are three rovers named curiosity, opertunity and spirit
-    --> 

@@ -1,101 +1,203 @@
-let store = {
-  user: { name: "Student" },
-  apod: "",
-  rovers: ["Curiosity", "Opportunity", "Spirit"],
-};
+//global store for app state
 
-// add our markup to the page
+let store = Immutable.Map({
+  user: Immutable.Map({
+    name: "student",
+  }),
+  rovers: ["Curiosity", "Opportunity", "Spirit"],
+  selectedRover: null,
+  loading: false,
+  data: {
+    manifesto: {},
+    photos: [],
+  },
+});
+
+// HTML root element(not functional)
 const root = document.getElementById("root");
 
-const updateStore = (store, newState) => {
-  store = Object.assign(store, newState);
-  render(root, store);
-};
-
-const render = async (root, state) => {
+// This function will be called every time state changes
+const render = (root, state) => {
   root.innerHTML = App(state);
 };
 
-// create content
-const App = (state) => {
-  let { rovers, apod } = state;
+// Our state will be updated using this method(not via direct mutation)
+//and app will re-render after state changes
+const updateState = (newState) => {
+  store = store.merge(newState);
+  render(root, store);
+};
 
+// our app ui will be defined here
+const App = (state) => {
   return `
-        <header></header>
+        <header>
+            ${NavBar(state)}
+        </header>
         <main>
-            ${Greeting(store.user.name)}
-            <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
+            <section>              
+              ${RoverComponent(state)}
             </section>
         </main>
-        <footer></footer>
     `;
 };
 
-// listening for load event because page should load before any JS is called
+//Navbar ui
+const NavBar = (state) => {
+  const selectedRover = state.get("selectedRover");
+  return `
+    <nav>
+        <div class="logo" onclick={hadleHomeClick(event)}>
+            <img src="./assets/mars-logo.png" alt="logo">
+            <span>Mars</span>
+        </div>
+        ${
+          selectedRover
+            ? `<div class="tabs">
+              <span onclick={handleTabClick(event)}>Curiosity</span>
+              <span onclick={handleTabClick(event)}>Opportunity</span>
+              <span onclick={handleTabClick(event)}>Spirit</span>
+          </div>`
+            : ""
+        }
+    </nav>
+    `;
+};
+
+// This component will decide what to show on screen using state of the app
+
+const RoverComponent = (state) => {
+  const selectedRover = state.get("selectedRover");
+
+  return `
+            ${selectedRover ? RoverItem(state) : RoverMenu(state)}   
+    `;
+};
+
+// Rover Menu component
+const RoverMenu = (state) => {
+  const loading = state.get("loading");
+  const rovers = state.get("rovers");
+  return `
+  <div class="rover">
+    <div class="container">
+            ${
+              loading
+                ? spinner()
+                : `<div class="text-container">
+                     <h1>Discover Mars Rovers</h1>
+                    </div>
+                  <div class="box-container">
+                      ${rovers
+                        .map((rover) => {
+                          return `<div id=${rover} onclick={handleClick(event)}>
+                                    ${rover}
+                                  </div>`;
+                        })
+                        .join(" ")}
+                  </div>`
+            }
+      </div>
+    </div>
+    `;
+};
+
+// Rover UI(Info and Photos)
+// On hovering photos it will show spacific details regarding particular photo
+const RoverItem = (state) => {
+  const manifesto = state.getIn(["data", "manifesto"]);
+  const photos = state.getIn(["data", "photos"]);
+  console.log({ manifesto, photos });
+  const { landing_date, launch_date, max_sol, name, status, total_photos } =
+    manifesto;
+
+  return `
+  <div class="rover-container">
+        <div class="info">
+            <h1>${name}</h1>
+            <ul>
+                <li>Launch Date:<span>${launch_date}</span> </li>
+                <li>Landing Date:<span>${landing_date}</span></li>
+                <li>Status:<span>${status}</span></li>
+                <li>Sol(Soler Days on Mars):<span>${max_sol}</span></li>
+                <li>Total Photos Clicked(on Mars):<span>${total_photos}</span></li>
+            </ul>
+        </div>
+        <div class="photos-container">
+            <h1>Latest photos</h1>
+            <div class="photos">
+                ${photos.map((photo) => {
+                  return `
+                    <div class="photo">
+                      <img src=${photo.img_src} alt="rover photo">
+                      <div>
+                        <ul>
+                            <li>Rover:<span>${photo.rover.name}</span></li>
+                            <li>Camera:<span>${photo.camera.name}</span></li>
+                            <li>Date:<span>${photo.earth_date}</span></li>
+                            <li>Sol:<span>${photo.sol}</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                    `;
+                })}               
+            </div>
+        </div>
+    </div>
+    `;
+};
+
+// spinner used when loading state is true
+const spinner = () => {
+  return `
+      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      `;
+};
+
+//click handler on rover menu componet
+const handleClick = async (event) => {
+  updateState({
+    loading: true,
+    selectedRover: null,
+    data: { manifesto: {}, photos: [] },
+  });
+
+  const rover = event.target.id;
+  const dataState = await fetchData(rover);
+  updateState({ data: dataState, selectedRover: rover, loading: false });
+};
+
+// async function for feching data
+const fetchData = async (rover) => {
+  const res = await fetch(`http://localhost:3000/${rover}`);
+  const data = await res.json();
+  return data;
+};
+
+//Home button
+const hadleHomeClick = (event) => {
+  updateState({ selectedRover: null });
+};
+
+//Navbar tabs onclick handlers
+const handleTabClick = async (event) => {
+  const rover = event.target.textContent;
+
+  if (store.get("selectedRover") === rover) {
+    return;
+  }
+
+  updateState({
+    loading: true,
+    selectedRover: null,
+    data: { manifesto: {}, photos: [] },
+  });
+
+  const dataState = await fetchData(rover);
+  updateState({ data: dataState, selectedRover: rover, loading: false });
+};
+
+// html load event handler
 window.addEventListener("load", () => {
   render(root, store);
 });
-
-// ------------------------------------------------------  COMPONENTS
-
-// Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
-const Greeting = (name) => {
-  if (name) {
-    return `
-            <h1>Welcome, ${name}!</h1>
-        `;
-  }
-
-  return `
-        <h1>Hello!</h1>
-    `;
-};
-
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = async (apod) => {
-  // If image does not already exist, or it is not from today -- request it again
-  const today = new Date();
-  const photodate = new Date(apod.date);
-  // console.log(photodate.getDate(), today.getDate());
-
-  // console.log(photodate.getDate() === today.getDate());
-  if (!apod || apod.date === today.getDate()) {
-    await getImageOfTheDay(store);
-  }
-
-  // check if the photo of the day is actually type video!
-  if (apod.media_type === "video") {
-    return `
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `;
-  } else {
-    return `
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `;
-  }
-};
-
-// ------------------------------------------------------  API CALLS
-
-// Example API call
-const getImageOfTheDay = async (state) => {
-  let { apod } = state;
-
-  fetch(`http://localhost:3000/apod`)
-    .then((res) => res.json())
-    .then((apod) => updateStore(store, { apod }));
-};

@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
 const path = require("path");
 const axios = require("axios");
 
@@ -70,7 +69,6 @@ app.get("/Spirit", (req, res) => {
         .then((lp) => {
           const one = resp.data.photo_manifest;
           one.photos = undefined;
-
           const two = lp.data.latest_photos;
 
           res.send({ manifesto: one, photos: two, res: resp.data });
