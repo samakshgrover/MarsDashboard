@@ -205,7 +205,7 @@ window.addEventListener("load", () => {
     .then((data) => {
       console.log(data);
       if (data.media_type === "image") {
-        document.body.style.background = `url(${data.url})`;
+        document.body.style.backgroundImage = `url(${data.url})`;
       }
     });
 });
