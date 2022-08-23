@@ -76,4 +76,12 @@ app.get("/Spirit", (req, res) => {
     });
 });
 
+app.get("/apod", (req, res) => {
+  axios
+    .get(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`)
+    .then((data) => {
+      res.send(data.data);
+    });
+});
+
 app.listen(port, () => console.log(`App listening on port ${port}!`));

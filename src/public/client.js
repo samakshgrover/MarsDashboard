@@ -1,4 +1,4 @@
-//global store for app state
+//global Immutable store for app state
 
 let store = Immutable.Map({
   user: Immutable.Map({
@@ -21,14 +21,13 @@ const render = (root, state) => {
   root.innerHTML = App(state);
 };
 
-// Our state will be updated using this method(not via direct mutation)
-//and app will re-render after state changes
+//Updates the state and re-render app
 const updateState = (newState) => {
   store = store.merge(newState);
   render(root, store);
 };
 
-// our app ui will be defined here
+// App component
 const App = (state) => {
   return `
         <header>
@@ -65,7 +64,6 @@ const NavBar = (state) => {
 };
 
 // This component will decide what to show on screen using state of the app
-
 const RoverComponent = (state) => {
   const selectedRover = state.get("selectedRover");
 
@@ -107,7 +105,6 @@ const RoverMenu = (state) => {
 const RoverItem = (state) => {
   const manifesto = state.getIn(["data", "manifesto"]);
   const photos = state.getIn(["data", "photos"]);
-  console.log({ manifesto, photos });
   const { landing_date, launch_date, max_sol, name, status, total_photos } =
     manifesto;
 
@@ -126,8 +123,9 @@ const RoverItem = (state) => {
         <div class="photos-container">
             <h1>Latest photos</h1>
             <div class="photos">
-                ${photos.map((photo) => {
-                  return `
+                ${photos
+                  .map((photo) => {
+                    return `
                     <div class="photo">
                       <img src=${photo.img_src} alt="rover photo">
                       <div>
@@ -140,7 +138,8 @@ const RoverItem = (state) => {
                       </div>
                     </div>
                     `;
-                })}               
+                  })
+                  .join(" ")}               
             </div>
         </div>
     </div>
@@ -200,4 +199,13 @@ const handleTabClick = async (event) => {
 // html load event handler
 window.addEventListener("load", () => {
   render(root, store);
+
+  fetch("http://localhost:3000/apod")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.media_type === "image") {
+        document.body.style.background = `url(${data.url})`;
+      }
+    });
 });
